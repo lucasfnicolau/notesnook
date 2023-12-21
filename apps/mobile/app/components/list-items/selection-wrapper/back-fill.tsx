@@ -17,22 +17,23 @@ You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
+import { Item } from "@notesnook/core";
 import { useThemeColors } from "@notesnook/theme";
 import React from "react";
 import { View } from "react-native";
 import useIsSelected from "../../../hooks/use-selected";
-import { useEditorStore } from "../../../stores/use-editor-store";
-import { Item } from "@notesnook/core";
+import { useTabStore } from "../../../screens/editor/tiptap/use-tab-store";
 
 export const Filler = ({ item, color }: { item: Item; color?: string }) => {
   const { colors } = useThemeColors();
-  const currentEditingNote = useEditorStore(
-    (state) => state.currentEditingNote
+  const isEditingNote = useTabStore(
+    (state) =>
+      state.tabs.find((t) => t.id === state.currentTab)?.noteId === item.id
   );
 
   const [selected] = useIsSelected(item);
 
-  return currentEditingNote === item.id || selected ? (
+  return isEditingNote || selected ? (
     <View
       style={{
         position: "absolute",
@@ -40,12 +41,11 @@ export const Filler = ({ item, color }: { item: Item; color?: string }) => {
         height: "150%",
         backgroundColor: colors.selected.background,
         borderLeftWidth: 5,
-        borderLeftColor:
-          currentEditingNote === item.id
+        borderLeftColor: isEditingNote
+          ? color
             ? color
-              ? color
-              : colors.selected.accent
-            : "transparent"
+            : colors.selected.accent
+          : "transparent"
       }}
       collapsable={false}
     />
